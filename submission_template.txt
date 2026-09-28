@@ -1,0 +1,4 @@
+Student Code: [Your Student Code here, e.g. QE200012]
+Full Name: [Your Full Name here, e.g. Nguyen Van A]
+GitHub Repository URL: [Your GitHub URL here, e.g. https://github.com/username/repo-name]
+Vercel Production URL: [Your Vercel URL here, e.g. https://your-project.vercel.app]
