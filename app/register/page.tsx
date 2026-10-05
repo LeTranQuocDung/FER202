@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { signUp } = useAuth();
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,6 +22,7 @@ export default function RegisterPage() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [authError, setAuthError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const validateName = (name: string) => {
@@ -46,8 +49,10 @@ export default function RegisterPage() {
     return '';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError('');
+    setSuccess(false);
     
     const nError = validateName(name);
     const eError = validateEmail(email);
@@ -60,10 +65,12 @@ export default function RegisterPage() {
     setConfirmPasswordError(cpError);
     
     if (!nError && !eError && !pError && !cpError) {
-      setSuccess(true);
-      // Optional: Redirect after success
-    } else {
-      setSuccess(false);
+      const { error } = await signUp({ email, password });
+      if (error) {
+        setAuthError(error.message);
+      } else {
+        setSuccess(true);
+      }
     }
   };
 
@@ -79,7 +86,12 @@ export default function RegisterPage() {
         <CardContent>
           {success && (
             <div data-testid="form-success" className="mb-4 p-3 rounded-md bg-green-50 text-green-600 text-sm font-medium">
-              Registration successful (demo)
+              Registration successful
+            </div>
+          )}
+          {authError && (
+            <div data-testid="error-auth" className="mb-4 p-3 rounded-md bg-red-50 text-red-600 text-sm font-medium">
+              {authError}
             </div>
           )}
           <form data-testid="register-form" noValidate onSubmit={handleSubmit} className="space-y-4">

@@ -7,15 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   const validateEmail = (email: string) => {
     if (!email.trim()) return 'Email is required';
@@ -29,8 +31,9 @@ export default function LoginPage() {
     return '';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError('');
     
     const eError = validateEmail(email);
     const pError = validatePassword(password);
@@ -39,11 +42,12 @@ export default function LoginPage() {
     setPasswordError(pError);
     
     if (!eError && !pError) {
-      setSuccess(true);
-      // Optional: Redirect after success
-      // setTimeout(() => router.push('/'), 2000);
-    } else {
-      setSuccess(false);
+      const { error } = await signIn({ email, password });
+      if (error) {
+        setAuthError(error.message);
+      } else {
+        router.push('/');
+      }
     }
   };
 
@@ -57,9 +61,9 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {success && (
-            <div data-testid="form-success" className="mb-4 p-3 rounded-md bg-green-50 text-green-600 text-sm font-medium">
-              Login successful (demo)
+          {authError && (
+            <div data-testid="error-auth" className="mb-4 p-3 rounded-md bg-red-50 text-red-600 text-sm font-medium">
+              {authError}
             </div>
           )}
           <form data-testid="login-form" noValidate onSubmit={handleSubmit} className="space-y-4">

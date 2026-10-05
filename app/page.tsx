@@ -1,9 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/ProductCard';
 import { products } from '@/data/products';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Home() {
+  const { user, signOut } = useAuth();
   return (
     <div className="min-h-screen bg-background font-sans text-foreground pb-12">
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -15,12 +19,21 @@ export default function Home() {
             <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">Lumina</h1>
           </div>
           <div className="flex gap-4">
-            <Link href="/login">
-              <Button variant="ghost" data-testid="btn-login" className="font-medium hover:bg-primary/10">Login</Button>
-            </Link>
-            <Link href="/register">
-              <Button data-testid="btn-register" className="font-medium bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity">Register</Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span data-testid="user-email" className="text-sm font-medium">{user.email}</span>
+                <Button variant="ghost" data-testid="btn-logout" onClick={() => signOut()} className="font-medium hover:bg-primary/10">Logout</Button>
+              </div>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" data-testid="btn-login" className="font-medium hover:bg-primary/10">Login</Button>
+                </Link>
+                <Link href="/register">
+                  <Button data-testid="btn-register" className="font-medium bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity">Register</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
